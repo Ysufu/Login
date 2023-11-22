@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ucup YouTube search</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('https://g.top4top.io/p_2881rwlie0.gif');
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    #searchInput {
+      color: #fff;
+    }
+
+    @keyframes animateBackground {
+      0% { background-position: 0 0; }
+      100% { background-position: 100% 100%; }
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      animation: animateBackground 30s linear infinite;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 10px 20px;
+      box-sizing: border-box;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .search-container input[type="text"],
+    .search-container button {
+      color: #000;
+      margin-left: 10px;
+    }
+
+    .mid {
+      text-align: center;
+      max-width: 800px;
+      margin: 80px auto 0 auto;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      justify-items: center;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+    }
+
+    iframe {
+      width: 100%;
+      height: 200px;
+      aspect-ratio: 16/9;
+      transition: transform 0.3s ease;
+    }
+
+    iframe.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+      .mid {
+        padding: 0 10px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .mid {
+        text-align: center;
+      }
+
+      input[type="text"],
+      button {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="navbar">
+    <h1>Ucup YouTube Search</h1>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Karaoke: Cari lagu...">
+      <button onclick="search()">Cari</button>
+    </div>
+  </div>
+  <div class="mid">
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function search() {
+      const apiKey = 'AIzaSyAj89tmu6IdABx27NNinbC-cPTzb0Ur4dM';
+      const query = document.getElementById('searchInput').value;
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=30&q=${query}&key=${apiKey}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          displayResults(data.items);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    function displayResults(videos) {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';
+
+      videos.forEach(video => {
+        const videoId = video.id.videoId;
+        const title = video.snippet.title;
+
+        const videoElement = document.createElement('iframe');
+        videoElement.src = `https://www.youtube.com/embed/${videoId}`;
+        videoElement.title = title;
+        videoElement.allowFullscreen = true;
+
+        videoElement.addEventListener('click', () => {
+          if (!videoElement.classList.contains('fullscreen')) {
+            videoElement.classList.add('fullscreen');
+            document.body.style.overflow = 'hidden';
+          } else {
+            videoElement.classList.remove('fullscreen');
+            document.body.style.overflow = 'auto';
+          }
+        });
+
+        resultsContainer.appendChild(videoElement);
+      });
+    }
+  </script>
+</body>
+</html>
+
